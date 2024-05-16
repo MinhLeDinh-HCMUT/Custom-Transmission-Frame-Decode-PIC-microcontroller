@@ -1,4 +1,4 @@
-# Custom transmission frame decode on PIC microcontroller using special function register (SFR)
+# Custom transmission frame decode on PIC microcontroller using Special Function Register (SFR)
 ## Microcontrollers that can be used
 - PIC16F877
 - PIC16F877A
