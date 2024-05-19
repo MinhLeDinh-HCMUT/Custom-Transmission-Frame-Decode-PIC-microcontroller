@@ -1,5 +1,5 @@
 #include <16F877A.h>
-#device ADC=10
+#device ADC=16
 #FUSES NOWDT                    // No Watch Dog Timer
 #FUSES NOBROWNOUT               // No brownout reset
 #FUSES NOLVP                    // No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
@@ -53,8 +53,11 @@ int allowovf;
 #bit PEIE=INTCON.6
 #bit GIE=INTCON.7
 
+#byte INTCON=0x0B
+
 #byte T1CON=0x10
 #bit TMR1ON=T1CON.0
+
 #byte TMR1L=0x0E
 #byte TMR1H=0x0F
 
@@ -65,6 +68,8 @@ int allowovf;
 #byte CCPR1L=0x15
 #byte CCPR1H=0x16
 #byte CCP1CON=0x17
+#bit CCP1X=CCP1CON.5
+#bit CCP1Y=CCP1CON.4
 
 #byte TMRO=0x01
 #byte OPREG=0x81
@@ -119,6 +124,13 @@ void uart_send(char data)
    TXREG=data;
 }
 
+void process_value(int16 input_value, int8 *msb_8bits,int8 lsb_2bits[2]) 
+{
+    *msb_8bits = (input_value >> 2) & 0xFF;
+    lsb_2bits[0] = (input_value >> 1) & 0x01;
+    lsb_2bits[1] = input_value & 0x01;
+}
+
 void uart_init()
 {
    BRGH=1; // High speed, asynchronous mode
@@ -167,10 +179,11 @@ void main()
    float encoder_read;
    int done1st=0,sent=0;
    
-   float kp=0,ki=0.2,kd=0; // Define PID parameters
+   float kp=0.001,ki=0.15,kd=0; // Define PID parameters
    double setpoint=0,volt=0,in_speed=0,tsamp=0.02,tcal; //Sampling time value for the first iteration only!
    double integral=0,last_error=0,error=0,derivative=0;  
    int16 pwmvalue;
+   int8 msb_8bits,lsb_2bits[2];
    CCPR1L=0;
    C1=0;
    lcd_gotoxy(1,1);
@@ -196,9 +209,12 @@ void main()
          else C1=0;
          if (volt>12) volt=12; // Create upper and lower limit
          if (volt<-12) volt=-12;
-         pwmvalue = round(255*abs(volt)/12.0); //Scale to PWM value (0->255)
-         if(pwmvalue>255) pwmvalue=255;                
-         CCPR1L=(unsigned int)pwmvalue;
+         pwmvalue = round(1023*abs(volt)/12.0); //Scale to PWM value (0->1023)
+         if(pwmvalue>1023) pwmvalue=1023;                
+         process_value(pwmvalue, &msb_8bits, lsb_2bits);
+         CCPR1L=msb_8bits;
+         CCP1X=lsb_2bits[0];
+         CCP1Y=lsb_2bits[1];
          TMR1L=0;
          TMR1H=0; // Calulate pulse frequency from the encoder input
          while(C0==1);
@@ -239,4 +255,3 @@ void main()
       }
    }
 }
-
