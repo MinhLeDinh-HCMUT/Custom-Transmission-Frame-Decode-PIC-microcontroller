@@ -1,5 +1,5 @@
 #include <16F877A.h>
-#device ADC=16
+#device ADC=10
 #FUSES NOWDT                    // No Watch Dog Timer
 #FUSES NOBROWNOUT               // No brownout reset
 #FUSES NOLVP                    // No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
@@ -53,11 +53,8 @@ int allowovf;
 #bit PEIE=INTCON.6
 #bit GIE=INTCON.7
 
-#byte INTCON=0x0B
-
 #byte T1CON=0x10
 #bit TMR1ON=T1CON.0
-
 #byte TMR1L=0x0E
 #byte TMR1H=0x0F
 
