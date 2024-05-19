@@ -29,3 +29,10 @@
 - Generate .hex file for the above project to put into the microcontroller in Proteus. 
 ## Project simulation video
 - https://drive.google.com/file/d/1-sbAnhIMAV6_CeADsyaDe60QoZeW19HL/view?usp=sharing
+## Reference
+- Matab: https://www.mathworks.com/products/new_products/release2021b.html
+- PIC CCS C: https://www.ccsinfo.com/compilers.php
+- Proteus: https://www.labcenter.com/
+- Hercules SETUP utility: https://www.hw-group.com/software/hercules-setup-utility
+- VSPD: https://www.eltima.com/products/vspdxp/
+
