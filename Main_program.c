@@ -117,6 +117,11 @@ int16 round(float number)
     return (int16)(number+0.5); // Round number to the closest integer
 }
 
+double absfunc(double number)
+{
+   if(number>=0) return number;
+   else return -number;
+}
 
 void uart_send(char data) 
 {
@@ -209,7 +214,7 @@ void main()
          else C1=0;
          if (volt>12) volt=12; // Create upper and lower limit
          if (volt<-12) volt=-12;
-         pwmvalue = round(1023*abs(volt)/12.0); //Scale to PWM value (0->1023)
+         pwmvalue = round(1023*absfunc(volt)/12.0); //Scale to PWM value (0->1023)
          if(pwmvalue>1023) pwmvalue=1023;                
          process_value(pwmvalue, &msb_8bits, lsb_2bits);
          CCPR1L=msb_8bits;
@@ -223,7 +228,7 @@ void main()
          while(C0==1);    
          while(C0==0);
          TMR1ON=0; 
-         time_count=make16(TMR1H,TMR1L)+ ovrflow*65536;
+         time_count=(((int16)TMR1H)<<8)|TMR1L+ ovrflow*65536;
          encoder_read=(5000000.0/time_count)/24*60; // Pulse per Rev=24     
          in_speed=round(encoder_read); // Speed from encoder=Freq/Pulse per Rev*60(s)    
          done1st=1; // Done 1st iteration
